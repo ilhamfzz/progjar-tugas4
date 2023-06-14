@@ -12,6 +12,7 @@ def send_command(command_str=""):
     logging.warning(f"connecting to {server_address}")
     try:
         logging.warning(f"sending message ")
+        print(command_str)
         sock.sendall(command_str.encode())
         # Look for the response, waiting until socket is done (no more data)
         data_received="" #empty string
@@ -40,12 +41,12 @@ def remote_list():
     command_str=f"LIST"
     hasil = send_command(command_str)
     if (hasil['status']=='OK'):
-        print("daftar file : ")
+        print("file list : ")
         for nmfile in hasil['data']:
             print(f"- {nmfile}")
         return True
     else:
-        print("Gagal")
+        print("Failed to retrieve file list")
         return False
 
 def remote_get(filename=""):
@@ -60,12 +61,47 @@ def remote_get(filename=""):
         fp.close()
         return True
     else:
-        print("Gagal")
+        print("Failed to retrieve file")
+        return False
+    
+def remote_upload(filename= ""):
+    command_str = f"PUT {filename}"
+    try:
+        fp = open(filename,'rb')
+        encodedFile = base64.b64encode(fp.read()).decode()
+        fp.close()
+        hasil = send_command(command_str + " " + encodedFile)
+        print(hasil)
+        if (hasil['status']=='OK'):
+            print(f"File {filename} succesfully uploaded")
+            return True
+        else:
+            print(f"Failed to upload {filename}")
+            return False
+    except:
+        print(f"Failed to upload {filename}")
+        return False
+
+def remote_delete(filename=""):
+    command_str=f"DELETE {filename}"
+    hasil = send_command(command_str)
+    if (hasil['status']=='OK'):
+        print(f"File {filename} succesfully deleted")
+        return True
+    else:
+        print(f"Failed to delete {filename}")
         return False
 
 
 if __name__=='__main__':
-    server_address=('172.16.16.101',6666)
+    server_address=('localhost',6666)
     remote_list()
-    remote_get('donalbebek.jpg')
+    # remote_get('donalbebek.jpg')
+    
+    # remote_upload('test-upload.txt')
+    remote_upload('mongop.jpg')
+    remote_list
+    
+    remote_delete('mongop.jpg')
+    remote_list()
 

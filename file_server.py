@@ -21,6 +21,20 @@ class ProcessTheClient(threading.Thread):
             data = self.connection.recv(32)
             if data:
                 d = data.decode()
+                try: 
+                    method = d.split(" ")
+                    method = method[0]
+                    print("method: ", method)
+                    if method.lower() == "put":
+                        while data != b'':
+                            data = self.connection.recv(32)
+                            d += data.decode()
+                            if len(data) < 32:
+                                break
+                            print("data received: ", data.decode())
+                except Exception as e:
+                    print(e)
+                    pass
                 hasil = fp.proses_string(d)
                 hasil=hasil+"\r\n\r\n"
                 self.connection.sendall(hasil.encode())
@@ -38,7 +52,7 @@ class Server(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        logging.warning(f"server berjalan di ip address {self.ipinfo}")
+        logging.warning(f"server running on {self.ipinfo}...")
         self.my_socket.bind(self.ipinfo)
         self.my_socket.listen(1)
         while True:
@@ -57,4 +71,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
