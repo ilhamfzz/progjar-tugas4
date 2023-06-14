@@ -71,7 +71,6 @@ def remote_upload(filename= ""):
         encodedFile = base64.b64encode(fp.read()).decode()
         fp.close()
         hasil = send_command(command_str + " " + encodedFile)
-        print(hasil)
         if (hasil['status']=='OK'):
             print(f"File {filename} succesfully uploaded")
             return True
@@ -101,7 +100,7 @@ if __name__=='__main__':
     # remote_upload('test-upload.txt')
     remote_upload('mongop.jpg')
     remote_list
-    
+
     remote_delete('mongop.jpg')
     remote_list()
 
